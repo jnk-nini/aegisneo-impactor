@@ -79,22 +79,16 @@ The full file map is in [Architecture § 2](docs/architecture.md#2-folder-struct
 
 ## Running locally
 
-Requires Node.js 24 (as in CI) and Python for the API.
+Requires Node.js 24 (as in CI). It uses the live AegisNEO API at https://aegisneo-api.vercel.app.
 
-1. Start the API from the repository root:
-   ```bash
-   python -m uvicorn index:app --port 8000
-   ```
-2. In `impactor/`, copy `.env.example` to `.env.local` and set `AEGISNEO_API_KEY`.
-   The API's public demo key is enough for local development.
-3. Install and run:
+1. Copy `.env.example` to `.env.local`. It already has the live API address and the public demo key.
+2. Install and run:
    ```bash
    npm install
    npm run dev
    ```
 
-To use the deployed API instead of a local one, set `AEGISNEO_API_URL=https://aegisneo-api.vercel.app`
-in `.env.local`.
+To run the API on your own computer instead, see the [AegisNEO API repository](https://github.com/jnk-nini/aegisneo-api) and set `AEGISNEO_API_URL=http://127.0.0.1:8000`.
 
 | Script            | Does                          |
 | ----------------- | ----------------------------- |
@@ -105,7 +99,7 @@ in `.env.local`.
 | `npm run preview` | Serve the production build    |
 | `npm run format`  | Prettier                      |
 
-GitHub Actions runs the tests, lint and build for Impactor and NEO Atlas on every push
+GitHub Actions runs the tests, lint and build on every push
 (`.github/workflows/ci.yml`). See [Testing](docs/testing.md).
 
 ## Deploying (Vercel)
@@ -113,7 +107,7 @@ GitHub Actions runs the tests, lint and build for Impactor and NEO Atlas on ever
 Impactor deploys as its **own Vercel project**, separate from the AegisNEO API project:
 
 1. Vercel → Add New Project → import this repository.
-2. Set **Root Directory** to `impactor`. The framework is detected as Vite.
+2. Leave **Root Directory** as `./`. The framework is detected as Vite.
 3. Add environment variables:
    - `AEGISNEO_API_KEY`: a key the API accepts
    - `AEGISNEO_API_URL`: `https://aegisneo-api.vercel.app` (the default if unset)

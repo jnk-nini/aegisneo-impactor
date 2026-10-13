@@ -7,7 +7,7 @@ import react from "@vitejs/plugin-react";
 // in the client bundle.
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const target = env.AEGISNEO_API_URL || "http://127.0.0.1:8000";
+  const target = env.AEGISNEO_API_URL || "https://aegisneo-api.vercel.app";
   if (!env.AEGISNEO_API_KEY) {
     console.warn("[impactor] AEGISNEO_API_KEY is not set — copy .env.example to .env.local.");
   }

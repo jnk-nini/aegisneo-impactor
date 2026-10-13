@@ -19,7 +19,7 @@ npm run build
 `npm run test:watch` re-runs the tests on every change.
 
 **Continuous integration**: GitHub Actions (`.github/workflows/ci.yml`) runs `npm ci`, `npm test`,
-`npm run lint` and `npm run build` for Impactor and NEO Atlas on every push to `master` and on every
+`npm run lint` and `npm run build` on every push to `master` and on every
 pull request. Vercel redeploys on each push, so this catches problems before they go live.
 
 Current result: **9 test files, 83 tests, all passing.**
