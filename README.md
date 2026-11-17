@@ -56,6 +56,24 @@ environment variable. The function only allows the endpoints above, drops unknow
 parameters, and caches responses at the edge (random picks are never cached).
 Details in [Architecture § 5](docs/architecture.md#5-talking-to-the-aegisneo-api).
 
+## Access from the AegisNEO hub
+
+The AegisNEO main site ([hub](https://aegisneo-api.vercel.app/frontend/)) is where visitors sign in. When it opens
+Impactor for an account, it adds a short-lived, read-only **ticket** to the address (`#aegis_ticket=...`). The site
+keeps it for that tab, removes it from the address bar, and sends it with every request to its own server function
+(`api/neo.js`), which passes it to the API next to the site's key. The API then serves the visitor by their role
+(the rules are the `site_access` table):
+
+| Visitor | What the API returns on this site |
+| --- | --- |
+| Opened from the hub with an account (user or admin) | the whole catalog |
+| No ticket (opened directly, or as a hub guest) | 10 featured asteroids |
+| Ticket expired (4 hours by default) | the site drops it, serves a guest and shows "Session ended" |
+
+A small badge at the bottom left shows who is signed in and links back to the hub (`src/lib/hub.js`). A ticket only
+works with this site's key and can never change data. Because the answer now depends on the visitor, the proxy sends
+`Cache-Control: private` and `Vary: x-aegisneo-ticket` instead of caching at the edge.
+
 ## No database needed
 
 - Asteroid data comes from the AegisNEO API.
