@@ -28,6 +28,14 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/neo/, "/api/v1"),
           headers: { "x-api-key": env.AEGISNEO_API_KEY || "" },
+          // Pass the visitor's ticket from the hub on, as api/neo.js does in production.
+          configure: (proxy) => {
+            proxy.on("proxyReq", (proxyReq, req) => {
+              const ticket = String(req.headers["x-aegisneo-ticket"] || "");
+              if (/^[\w-]+\.[\w-]+\.[\w-]+$/.test(ticket))
+                proxyReq.setHeader("authorization", `Bearer ${ticket}`);
+            });
+          },
         },
       },
     },

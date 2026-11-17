@@ -35,7 +35,8 @@ describe("api/neo proxy", () => {
     const [url, init] = fetch.mock.calls[0];
     expect(url.toString()).toBe("https://api.example.test/api/v1/asteroids?search=Bennu&limit=30");
     expect(init.headers["x-api-key"]).toBe("test-key");
-    expect(res.headers["Cache-Control"]).toContain("s-maxage");
+    expect(res.headers["Cache-Control"]).toContain("private");
+    expect(res.headers.Vary).toBe("x-aegisneo-ticket");
   });
 
   it("allows single asteroids and random picks, and never caches random picks", async () => {
