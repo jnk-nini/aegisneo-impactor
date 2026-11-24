@@ -29,3 +29,21 @@ export async function applyScenarioQuery(query, { launch = false } = {}) {
   if (launch && useSim.getState().target) useSim.getState().launch();
   return true;
 }
+
+const ASTEROID_ID = /^[A-Za-z0-9_-]{1,32}$/;
+
+/**
+ * A link from the AegisNEO Explorer ("Open in Impactor") carries just ?asteroid=<id>:
+ * choose that asteroid with its real size and speed, and let the visitor pick the target.
+ * Returns false when the link has no asteroid or the catalog does not have it.
+ */
+export async function applyAsteroidParam(search) {
+  const id = new URLSearchParams(search).get("asteroid");
+  if (!id || !ASTEROID_ID.test(id)) return false;
+  try {
+    useSim.getState().selectAsteroid(await api.get(id));
+    return true;
+  } catch {
+    return false;
+  }
+}
