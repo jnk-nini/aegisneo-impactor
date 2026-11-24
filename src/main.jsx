@@ -7,7 +7,7 @@ import App from "./App.jsx";
 import { captureTicket, mountHubPill } from "./lib/hub.js";
 
 captureTicket();
-mountHubPill();
+mountHubPill({ narrowRight: 62 });
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

@@ -58,7 +58,7 @@ Details in [Architecture § 5](docs/architecture.md#5-talking-to-the-aegisneo-ap
 
 ## Access from the AegisNEO hub
 
-The AegisNEO main site ([hub](https://aegisneo-api.vercel.app/frontend/)) is where visitors sign in. When it opens
+The AegisNEO main site ([hub](https://aegisneo-hub.vercel.app/)) is where visitors sign in. When it opens
 Impactor for an account, it adds a short-lived, read-only **ticket** to the address (`#aegis_ticket=...`). The site
 keeps it for that tab, removes it from the address bar, and sends it with every request to its own server function
 (`api/neo.js`), which passes it to the API next to the site's key. The API then serves the visitor by their role
@@ -99,7 +99,7 @@ The full file map is in [Architecture § 2](docs/architecture.md#2-folder-struct
 
 Requires Node.js 24 (as in CI). It uses the live AegisNEO API at https://aegisneo-api.vercel.app.
 
-1. Copy `.env.example` to `.env.local`. It already has the live API address and the public demo key.
+1. Copy `.env.example` to `.env.local`. It has the live API address; add this site's partner key (ask the project owner) as `AEGISNEO_API_KEY`.
 2. Install and run:
    ```bash
    npm install
@@ -132,12 +132,19 @@ Impactor deploys as its **own Vercel project**, separate from the AegisNEO API p
 4. Deploy.
 
 Each website has its own key, listed in `AEGISNEO_API_KEYS` on the **API** project,
-e.g. `aegisneo-web:<key1>,impactor:<key2>`, so one can be revoked without breaking
+e.g. `impactor:<key1>,neo-atlas:<key2>`, so one can be revoked without breaking
 the others.
 
 The proxy keeps the key out of the browser, but it is not access control: anyone
-can call this site's `/api/neo/*` endpoints, and there is no rate limit. The key
-identifies which site is asking; it doesn't keep anyone out.
+can call this site's `/api/neo/*` endpoints. It only forwards read-only requests with
+the parameters the site itself uses (anything else is a 400), and cuts every value to
+64 characters. It does not rate-limit; for that, add a rate-limit rule in the Vercel
+Firewall for `/api/neo/*`. The key identifies which site is asking; it doesn't keep
+anyone out.
+
+The site is served with a Content-Security-Policy (see `vercel.json`): scripts and
+workers only from this site, and NASA GIBS (`gibs.earthdata.nasa.gov`) as the only
+other place images and tiles may come from.
 
 ## Limitations
 

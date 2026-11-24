@@ -27,16 +27,29 @@ describe("api/neo proxy", () => {
 
   it("forwards allowed paths and params with the key attached", async () => {
     const res = mockRes();
-    await handler(
-      { method: "GET", query: { path: "asteroids", search: "Bennu", limit: "30", evil: "x" } },
-      res,
-    );
+    await handler({ method: "GET", query: { path: "asteroids", search: "Bennu", limit: "30" } }, res);
     expect(res.statusCode).toBe(200);
     const [url, init] = fetch.mock.calls[0];
     expect(url.toString()).toBe("https://api.example.test/api/v1/asteroids?search=Bennu&limit=30");
     expect(init.headers["x-api-key"]).toBe("test-key");
     expect(res.headers["Cache-Control"]).toContain("private");
     expect(res.headers.Vary).toBe("x-aegisneo-ticket");
+  });
+
+  it("rejects unknown parameters, so they can't be used to skip the cache", async () => {
+    const res = mockRes();
+    await handler({ method: "GET", query: { path: "asteroids", search: "Bennu", nocache: "123" } }, res);
+    expect(res.statusCode).toBe(400);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("cuts over-long values and trims a key pasted with a stray newline", async () => {
+    process.env.AEGISNEO_API_KEY = "  test-key\n";
+    const res = mockRes();
+    await handler({ method: "GET", query: { path: "asteroids", search: "x".repeat(500) } }, res);
+    const [url, init] = fetch.mock.calls[0];
+    expect(new URL(url).searchParams.get("search")).toHaveLength(64);
+    expect(init.headers["x-api-key"]).toBe("test-key");
   });
 
   it("allows single asteroids and random picks, and never caches random picks", async () => {
