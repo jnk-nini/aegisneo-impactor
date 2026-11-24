@@ -2,7 +2,7 @@ import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { useSim } from "./store.js";
 import { useIsMobile } from "./ui/hooks.js";
 import { loadEarthImages, loadLandMask } from "./lib/world.js";
-import { applyScenarioQuery } from "./lib/scenario.js";
+import { applyAsteroidParam, applyScenarioQuery } from "./lib/scenario.js";
 import TopBar from "./ui/TopBar.jsx";
 import Hud from "./ui/Hud.jsx";
 import ViewControls from "./ui/ViewControls.jsx";
@@ -54,7 +54,9 @@ export default function App() {
     if (restored.current || !location.search) return;
     if (show3d && !globeReady) return;
     restored.current = true;
-    applyScenarioQuery(location.search, { launch: true }).catch(() => {});
+    applyScenarioQuery(location.search, { launch: true })
+      .then((restoredScenario) => restoredScenario || applyAsteroidParam(location.search))
+      .catch(() => {});
   }, [show3d, globeReady]);
 
   // On phones, after choosing an asteroid, guide the user to pick a target on the globe.
